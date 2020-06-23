@@ -85,6 +85,13 @@ public class SAPConnUtils {
         }
         return destination;
     }
+
+    public static void main(String[] args) {
+
+        SapConn con = new SapConn();
+        // 测试连接
+        SAPConnUtils.connect(con);
+    }
 }
 
 
