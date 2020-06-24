@@ -1,6 +1,7 @@
 package com.sim.sapjco.utils;
 
 import com.sap.conn.jco.JCoDestination;
+import com.sap.conn.jco.JCoDestinationManager;
 import com.sap.conn.jco.JCoFunction;
 import com.sap.conn.jco.JCoTable;
 import com.sim.sapjco.annotations.JcoEntity;
@@ -8,8 +9,6 @@ import com.sim.sapjco.annotations.JcoField;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -21,19 +20,17 @@ import java.util.Objects;
  * @version 1
  * @date 2020/6/24 11:21
  */
-@Component
 @Slf4j
 public class JCOUtils {
+    private static final String ABAP_AS_POOLED = "ABAP_AS_WITH_POOL";
 
-    @Autowired
-    private JCoDestination jCoDestination;
 
     /**
      * @param tClass
      * @param <T>
      * @return
      */
-    public <T> List<T> getObject(Class<T> tClass) {
+    public static <T> List<T> getObject(Class<T> tClass) {
         final JcoEntity jcoEntity = tClass.getAnnotation(JcoEntity.class);
         List<T> result = new ArrayList<>();
         //TODO 定义全局异常
@@ -41,6 +38,7 @@ public class JCOUtils {
             return result;
         }
         try {
+            final JCoDestination jCoDestination = JCoDestinationManager.getDestination(ABAP_AS_POOLED);
             final JCoFunction function = jCoDestination.getRepository().getFunction(jcoEntity.interfaceName());
             function.execute(jCoDestination);
             final JCoTable table = function.getTableParameterList().getTable(0);
